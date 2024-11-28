@@ -181,6 +181,7 @@ func (we *Webserver) HandleRequest(w http.ResponseWriter, r *http.Request) {
 	tempF := (temperatureC * 9 / 5) + 32
 
 	response := map[string]interface{}{
+		"city":   location,
 		"temp_C": temperatureC,
 		"temp_K": tempK,
 		"temp_F": tempF,

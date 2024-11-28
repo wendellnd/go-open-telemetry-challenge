@@ -41,7 +41,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
       - REQUEST_NAME_OTEL=temperature-request
       - HTTP_PORT=:8181
-      - WEATHER_API_KEY=your_api_key
+      - WEATHER_API_KEY=f3ae8755a7ed4a11b7c13830242611
     ports:
       - "8181:8181"
     depends_on:
