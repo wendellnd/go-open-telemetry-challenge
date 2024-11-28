@@ -8,4 +8,4 @@
 
 - Quando o container estiver no ar, acesse [./api/zipcode.http](./api/zipcode.http) para executar a chamada http para a aplicação
 
-- Acesse o zipkin no endereço http://localhost:9411/
+- Acesse o zipkin no endereço http://localhost:9411/ para visualizar as informações dos spans
