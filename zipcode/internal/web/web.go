@@ -67,12 +67,12 @@ func (we *Webserver) HandleRequest(w http.ResponseWriter, r *http.Request) {
 
 	zipCode, ok := reqPayload["cep"]
 	if !ok {
-		http.Error(w, "missing zipcode", http.StatusBadRequest)
+		http.Error(w, "invalid zipcode", http.StatusUnprocessableEntity)
 		return
 	}
 
 	if !isValidZipcode(zipCode) {
-		http.Error(w, "invalid zipcode", http.StatusBadRequest)
+		http.Error(w, "invalid zipcode", http.StatusUnprocessableEntity)
 		return
 	}
 
