@@ -1,0 +1,69 @@
+version: "3"
+services:
+  zipkin:
+    image: ghcr.io/openzipkin/zipkin-slim:3.4.2
+    container_name: zipkin
+    environment:
+      - STORAGE_TYPE=mem
+      - SELF_TRACING_ENABLED=true
+    ports:
+      - 9411:9411
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v3.0.0
+    restart: always
+    volumes:
+      - ./.docker/prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  otel-collector:
+    image: otel/opentelemetry-collector:0.114.0
+    restart: always
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    depends_on:
+      - zipkin
+    volumes:
+      - ./.docker/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "8888:8888"
+      - "8889:8889"
+      - "4317:4317"
+
+  # Service B
+  temperature:
+    container_name: temperature
+    build:
+      context: ./temperature
+    environment:
+      - OTEL_SERVICE_NAME=temperature-service
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
+      - REQUEST_NAME_OTEL=temperature-request
+      - HTTP_PORT=:8181
+      - WEATHER_API_KEY=your_api_key
+    ports:
+      - "8181:8181"
+    depends_on:
+      - zipkin
+      - prometheus
+      - otel-collector
+
+  # Service A
+  zipcode:
+    container_name: zipcode
+    build:
+      context: ./zipcode
+    environment:
+      - OTEL_SERVICE_NAME=zipcode-service
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
+      - TEMPERATURE_URL=http://temperature:8181/
+      - REQUEST_NAME_OTEL=zipcode-request
+      - HTTP_PORT=:8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - temperature
+      - zipkin
+      - prometheus
+      - otel-collector
