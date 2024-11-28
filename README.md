@@ -1,0 +1,1 @@
+# go-open-telemetry-challenge
